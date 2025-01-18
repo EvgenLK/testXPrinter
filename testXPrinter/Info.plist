@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>this permission for profile photo only</string>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>this permission for profile photo only</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Приложение использует Bluetooth для отправки данных</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Приложение использует Bluetooth для поиска устройств</string>
+</dict>
+</plist>
