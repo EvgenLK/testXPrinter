@@ -1,15 +1,14 @@
 import SwiftUI
-import PDFKit
-import CoreBluetooth
-import UniformTypeIdentifiers
 import UIKit
 
 struct ContentView: View {
     @StateObject private var bluetoothManager = BluetoothManager()
+    @StateObject private var fileManager = FilePickerManager()
+
     private var testText = "Hey"
     private var barcode = "111122233344"
     private var testImage = UIImage(named: "Document1")
-    
+
     var body: some View {
         NavigationView {
             VStack {
@@ -28,12 +27,8 @@ struct ContentView: View {
                     }
                 }
 
-                // Устройство подключено
-                if let device = bluetoothManager.connectedDevice {
-                    Text("Подключено к: \(device.name ?? "устройству")")
-                        .padding()
-
-                    // Кнопка для тестовой печати текста
+                // Кнопки
+                VStack {
                     Button("Отправить тестовый текст") {
                         bluetoothManager.sendTSPLText(testText)
                     }
@@ -42,40 +37,36 @@ struct ContentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(8)
 
-                    // Кнопка для тестовой печати баркода
-                    Button("Отправить баркод") {
-                        bluetoothManager.sendTSPLBarcode(barcode)
-                    }
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    
-                    // Кнопка для тестовой печати растрового изображения
-                    Button("Отправить растровую картинку") {
-                        if let img = testImage {
-                            bluetoothManager.printImageOnPrinter(img: img, x: 0, y: 20)
-                        } else {
-                            print("Ошибка: Изображение отсутствует")
-                        }
-                    }
-                    .padding()
-                    .background(Color.green)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                    
-                    // Кнопка для выбора файла
                     Button("Выбрать PDF файл") {
-                        bluetoothManager.openFilePicker()
+                        fileManager.openFilePicker()
                     }
                     .padding()
                     .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(8)
                 }
+                .padding()
+            }
+            .onChange(of: fileManager.selectedFileURL) { oldValue, newValue in
+                if let url = newValue {
+                    handlePickedFile(url: url)
+                }
+            }
+            .onChange(of: fileManager.isPickerCancelled) { oldValue, newValue in
+                if newValue {
+                    print("Пользователь отменил выбор файла.")
+                }
             }
             .navigationTitle("Bluetooth Scanner")
         }
     }
-}
 
+    // Обработчик выбранного файла
+    private func handlePickedFile(url: URL) {
+        guard let pdfImage = PDFProcessor.convertPDFToImage(url: url, pageIndex: 0) else {
+            print("Ошибка: Не удалось преобразовать PDF в изображение.")
+            return
+        }
+        bluetoothManager.printImageOnPrinter(img: pdfImage, x: 0, y: 0)
+    }
+}
